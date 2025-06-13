@@ -1,192 +1,177 @@
-# Leaf Disease Analysis
+# Plant Image Analysis Toolkit
 
-An automated image analysis tool for detecting and quantifying leaf diseases and chlorosis in plant images using computer vision techniques.
+Python tools for plant image processing, including automated leaf disease detection and image temperature adjustment for optimal analysis conditions.
 
 ## Overview
 
-This Python application processes plant leaf images to identify and measure:
+This repository contains two main tools:
+
+1. **leafState** - Automated detection and quantification of leaf diseases and chlorosis
+2. **thermostat** - Color temperature correction for consistent image analysis
+
+## Tools
+
+### 1. Leaf Disease Analysis (`leaf_analysis.py`)
+
+Processes plant leaf images to identify and measure:
 - **Disease areas** (brownish/necrotic regions)
-- **Chlorosis** (yellowing regions indicating nutrient deficiency)
+- **Chlorosis** (yellowing regions indicating nutrient deficiency) 
 - **Healthy leaf tissue**
 
-The tool generates masked visualization images and comprehensive analysis reports with percentage breakdowns of each condition.
+Generates masked visualization images and comprehensive analysis reports with percentage breakdowns.
+
+### 2. Image Temperature Adjustment (`temperature_tool.py`)
+
+Adjusts the color temperature of images to:
+- **Warm images** (increase red, decrease blue)
+- **Cool images** (decrease red, increase blue)
+- **Standardize lighting conditions** for consistent analysis
 
 ## Features
 
-- **Batch Processing**: Analyzes entire directories of images automatically
-- **Multiple Formats**: Supports TIFF, PNG, JPG, and JPEG image formats
-- **Visual Output**: Creates color-coded mask overlays showing disease and chlorosis areas
-- **Detailed Reports**: Generates CSV summaries and text reports with statistics
-- **Timestamped Results**: Organizes outputs by processing date/time
-- **Robust Logging**: Comprehensive logging for debugging and monitoring
+### Leaf Disease Analysis
+- **Batch Processing**: Analyzes entire directories automatically
+- **Multiple Formats**: Supports TIFF, PNG, JPG, and JPEG
+- **Visual Output**: Color-coded mask overlays
+- **Detailed Reports**: CSV summaries and statistical reports
+- **Timestamped Results**: Organized output by processing date/time
+- **Robust Logging**: Comprehensive logging for monitoring
 
-## Requirements
+### Temperature Adjustment
+- **Batch Processing**: Processes entire directories
+- **Precise Control**: Adjustable temperature factors
+- **Format Preservation**: Maintains original image quality
+- **Non-destructive**: Creates new files, preserves originals
 
-### Dependencies
+
+### Required Libraries
+- `PIL (Pillow)` - Image processing
+- `numpy` - Numerical operations
+- `opencv-python` - Computer vision (disease analysis)
+- `scikit-image` - Morphological operations (disease analysis)
+- `pandas` - Data analysis and reporting (disease analysis)
 
 ```bash
 pip install pillow numpy opencv-python scikit-image pandas
 ```
 
-### Required Libraries
-- `PIL (Pillow)` - Image processing
-- `numpy` - Numerical operations
-- `opencv-python` - Computer vision operations
-- `scikit-image` - Advanced image processing (morphological operations)
-- `pandas` - Data analysis and CSV export
-
-## Installation
-
-1. Clone this repository:
-```bash
-git clone <repository-url>
-cd leaf-disease-analysis
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Create a directory structure:
-```
-your-project/
-├── touched/          # Input images directory
-├── leaf_analysis.py  # Main analysis script
-└── output/          # Generated automatically
-```
-
 ## Usage
 
-### Basic Usage
+### Leaf Disease Analysis
 
-1. Place your leaf images in the `touched` directory
-2. Run the analysis script:
+1. Run the analysis:
 ```bash
-python leaf_analysis.py
+python leafState.py
 ```
 
-### Configuration
-
-Edit the configuration variables at the top of `leaf_analysis.py`:
-
+**Configuration options:**
 ```python
-DIRECTORY_PATH = "touched"              # Input directory
-DISEASE_HUE = 30                        # Hue value for disease detection (0-360)
-CHLOROSIS_HUE_RANGE = (30, 43)         # Hue range for chlorosis detection
-MIN_LEAF_SIZE = 500                     # Minimum leaf area in pixels
-MIN_DISEASE_SIZE = 300                  # Minimum disease area in pixels
+DIRECTORY_PATH = "path/to/your/image_directory"              # Input directory
+DISEASE_HUE = 30                        # Disease detection threshold
+CHLOROSIS_HUE_RANGE = (30, 43)         # Chlorosis detection range
+MIN_LEAF_SIZE = 500                     # Minimum leaf area (pixels)
+MIN_DISEASE_SIZE = 300                  # Minimum disease area (pixels)
 ```
 
-### Output Structure
+### Image Temperature Adjustment
 
-The tool creates timestamped output directories:
+1. Place images in the input directory
+2. Modify the script parameters:
+```python
+input_directory = '2025_Individuals'        # Input folder
+output_directory = '2025_Individuals/thermo' # Output folder
+temperature_factor = 0.9                     # <1 cooler, >1 warmer
+```
 
+3. Run the temperature adjustment:
+```bash
+python thermostat.py
+```
+
+**Temperature Factor Guide:**
+- `0.7` - Significantly cooler (more blue)
+- `0.9` - Slightly cooler 
+- `1.0` - No change
+- `1.1` - Slightly warmer
+- `1.3` - Significantly warmer (more red)
+
+## Workflow Recommendations
+
+### For Disease Analysis Projects
+
+1. **Preprocessing** (Optional):
+   ```bash
+   # Adjust temperature for consistent lighting
+   python temperature_tool.py
+   ```
+
+2. **Disease Analysis**:
+   ```bash
+   # Analyze preprocessed or original images
+   python leaf_analysis.py
+   ```
+
+### For Optimal Results
+
+1. Use temperature adjustment to standardize lighting conditions across image batches
+2. Process temperature-adjusted images through disease analysis
+3. Compare results with and without temperature adjustment to validate improvements
+
+## Output Files
+
+### Disease Analysis Output
+
+**Directory Structure:**
 ```
 output/
 └── YYYYMMDD_HHMMSS/
     ├── image1_masked.png           # Visualized results
-    ├── image2_masked.png
     ├── summary_results.csv         # Detailed measurements
     └── analysis_summary.txt        # Statistical summary
 ```
 
-## Output Files
-
-### Masked Images
-- **Background**: Transparent (removed)
+**Masked Images:**
 - **Disease areas**: Brownish-red overlay (RGB: 166, 56, 22)
 - **Chlorosis areas**: Yellow overlay (RGB: 255, 222, 83)
 - **Healthy areas**: Original leaf color
+- **Background**: Transparent
 
-### CSV Report (`summary_results.csv`)
-Contains per-image measurements:
-- `filename`: Image filename
-- `leaf_area_px`: Total leaf area in pixels
-- `healthy_area_px`: Healthy tissue area
-- `disease_area_px`: Disease area
-- `chlorosis_area_px`: Chlorosis area
-- `percent_healthy`: Percentage of healthy tissue
-- `percent_disease`: Percentage of diseased tissue
-- `percent_chlorosis`: Percentage of chlorotic tissue
+**CSV Report Fields:**
+- `filename`, `leaf_area_px`, `healthy_area_px`
+- `disease_area_px`, `chlorosis_area_px`
+- `percent_healthy`, `percent_disease`, `percent_chlorosis`
 
-### Summary Report (`analysis_summary.txt`)
-Contains:
-- Processing timestamp
-- Total images processed
-- Average percentages across all images
-- Configuration parameters used
+### Temperature Adjustment Output
 
-## Algorithm Details
+Temperature-adjusted images are saved to the specified output directory with:
+- Same filename as original
+- Preserved image quality and format
+- Modified color temperature based on adjustment factor
 
-### Image Processing Pipeline
-
-1. **Color Space Conversion**: RGB → HSV for better color segmentation
-2. **Hue Normalization**: Converts 360° hue values to 0-255 range
-3. **Mask Generation**: Creates binary masks for leaf, disease, and chlorosis areas
-4. **Morphological Operations**: 
-   - Removes small objects (noise reduction)
-   - Fills small holes in detected regions
-5. **Area Calculation**: Computes pixel counts and percentages
-6. **Visualization**: Creates color-coded overlay images
-
-### Color Detection
-
-- **Leaf Detection**: HSV range [0-90, 0-255, 0-255] (excludes background)
-- **Disease Detection**: Hue values up to configured threshold (default: 30°)
-- **Chlorosis Detection**: Hue range 30-43° (yellow spectrum)
-
-## Customization
-
-### Adjusting Detection Parameters
-
-**For different plant species or imaging conditions:**
-
-- **DISEASE_HUE**: Increase for more brown/red disease detection
-- **CHLOROSIS_HUE_RANGE**: Adjust for different yellowing patterns
-- **MIN_LEAF_SIZE**: Change based on image resolution and leaf size
-- **MIN_DISEASE_SIZE**: Adjust sensitivity to small disease spots
-
-### Adding New Analysis Types
-
-The modular design allows easy extension for additional conditions:
-
-1. Define new color ranges
-2. Create mask generation functions
-3. Add area calculations
-4. Update visualization colors
-
-## Troubleshooting
-
-### Common Issues
-
-**No results generated:**
-- Check image file formats (must be .tif, .tiff, .png, .jpg, .jpeg)
-- Verify images are in the correct input directory
-- Check log files for error messages
-
-**Poor detection accuracy:**
-- Adjust hue thresholds for your specific plant species
-- Modify minimum size parameters
-- Ensure consistent lighting in images
-
-**Memory issues with large images:**
-- Process images in smaller batches
-- Resize images before processing if necessary
-
-### Logging
-
-Check `leaf_analysis.log` for detailed processing information and error messages.
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+3. Add tests for new functionality
+4. Submit a pull request
 
+## License
+
+[MIT License]
+
+## Citation
+
+If you use these tools in your research, please cite:
+
+```
+Coming soon
+```
+
+## Contact
+
+leon.lenzo@curtin.edu.au
 
 ---
 
-**Note**: This tool is designed for research purposes. Results should be validated against manual assessments for critical applications.
+**Note**: These tools are designed for research purposes. Results should be validated against manual assessments for critical applications.
