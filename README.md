@@ -1,4 +1,4 @@
-# Plant Image Analysis Toolkit
+# Foliar Utility and Classification Kit - High-throughput Evaluation Analysis Database
 
 Python tools for plant image processing, including automated leaf disease detection and image temperature adjustment for optimal analysis conditions.
 
