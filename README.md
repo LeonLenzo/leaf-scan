@@ -1,4 +1,4 @@
-# Foliar Utility and Classification Kit - High-throughput Evaluation Analysis Database
+# Foliar Utility and Classification Kit - High-throughput Exploratory Analysis of Disease
 
 Python tools for plant image processing, including automated leaf disease detection and image temperature adjustment for optimal analysis conditions.
 
