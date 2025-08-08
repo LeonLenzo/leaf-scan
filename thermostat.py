@@ -66,8 +66,8 @@ def process_images(input_dir, output_dir, temperature_factor):
                 print(f"Failed to process {filename}: {e}")
 
 if __name__ == '__main__':
-    input_directory = '2025_Individuals'
-    output_directory = '2025_Individuals/thermo'
+    input_directory = 'intergrain'
+    output_directory = 'intergrain/thermo'
     temperature_factor = 0.9  # >1 for warmer, <1 for cooler
 
     if not os.path.exists(input_directory):

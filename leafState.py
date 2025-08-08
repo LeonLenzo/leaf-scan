@@ -19,12 +19,12 @@ logging.basicConfig(
 )
 
 # HARD-CODED CONFIGURATION
-DIRECTORY_PATH = "."  # Replace with your actual path
+DIRECTORY_PATH = "./intergrain"  # Replace with your actual path
 OUTPUT_DIRECTORY = os.path.join(DIRECTORY_PATH, "output")
 DISEASE_HUE = 30  # Adjusted hue value for disease
 CHLOROSIS_HUE_RANGE = (30, 43)  # Hue range for chlorosis (yellowing)
 MIN_LEAF_SIZE = 500  # Minimum size of leaf area in pixels
-MIN_DISEASE_SIZE = 300  # Minimum size of disease area in pixels
+MIN_DISEASE_SIZE = 10  # Minimum size of disease area in pixels
 def normalize_hue(h):
     """Normalize hue from [0, 360] to [0, 255]"""
     return int(h * 255 / 360)
