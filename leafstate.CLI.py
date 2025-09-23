@@ -1,5 +1,7 @@
 """
-Leaf Health Analysis Tool
+leafstate - Leaf Health Analysis Command Line Interface
+
+🍃 Command-line tool for analyzing plant leaf health
 
 Analyzes plant leaf images to detect and quantify:
 - Healthy tissue (green)
@@ -7,7 +9,14 @@ Analyzes plant leaf images to detect and quantify:
 - Necrosis (brown/dead tissue)
 
 Author: Leon Lenzo
-Usage: python leafstate2.py [input_directory] [output_directory]
+Usage:
+  python leafstate.CLI.py                    # Analyze current directory
+  python leafstate.CLI.py --input ./images  # Analyze specific directory
+  python leafstate.CLI.py --help            # Show all options
+
+Requirements:
+- Python 3.7+
+- pip install opencv-python pillow scikit-image pandas numpy
 """
 
 import os
@@ -380,9 +389,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python leafstate2.py                    # Process current directory
-  python leafstate2.py --input ./images  # Process specific directory
-  python leafstate2.py --verbose         # Enable detailed logging
+  python leafstate.CLI.py                    # Process current directory
+  python leafstate.CLI.py --input ./images  # Process specific directory
+  python leafstate.CLI.py --verbose         # Enable detailed logging
         """
     )
 

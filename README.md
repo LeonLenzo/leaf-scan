@@ -1,152 +1,206 @@
-# Foliar Utility and Classification Kit - High-throughput Evaluation Analysis Database
+# 🍃 Leaf Health Analysis Tool
 
-Python tools for plant image processing, including automated leaf disease detection and image temperature adjustment for optimal analysis conditions.
+A comprehensive Python toolkit for analyzing plant leaf health from images. Detects and quantifies healthy tissue, chlorosis (yellowing), and necrosis (browning) in plant leaves with both command-line and GUI interfaces.
 
-## Overview
+## ✨ Key Features
 
-This repository contains two main tools:
+- **🔍 Multi-leaf Detection**: Automatically separates and analyzes individual leaves in each image
+- **📊 Health Quantification**: Measures percentages of healthy, chlorotic, and necrotic tissue
+- **🎨 Visual Output**: Generates color-coded visualizations of detected areas
+- **⚡ Batch Processing**: Processes entire directories of images efficiently
+- **🖥️ Dual Interface**: Both command-line tool and user-friendly GUI
+- **⚙️ Flexible Configuration**: Adjustable parameters for different leaf sizes and analysis needs
+- **📈 Detailed Reports**: CSV output with comprehensive statistics
 
-1. **leafState** - Automated detection and quantification of leaf diseases and chlorosis
-2. **thermostat** - Color temperature correction for consistent image analysis
+## 🚀 Quick Start
 
-## Tools
-
-### 1. Leaf Disease Analysis (`leaf_analysis.py`)
-
-Processes plant leaf images to identify and measure:
-- **Disease areas** (brownish/necrotic regions)
-- **Chlorosis** (yellowing regions indicating nutrient deficiency) 
-- **Healthy leaf tissue**
-
-Generates masked visualization images and comprehensive analysis reports with percentage breakdowns.
-
-### 2. Image Temperature Adjustment (`temperature_tool.py`)
-
-Adjusts the color temperature of images to:
-- **Warm images** (increase red, decrease blue)
-- **Cool images** (decrease red, increase blue)
-- **Standardize lighting conditions** for consistent analysis
-
-## Features
-
-### Leaf Disease Analysis
-- **Batch Processing**: Analyzes entire directories automatically
-- **Multiple Formats**: Supports TIFF, PNG, JPG, and JPEG
-- **Visual Output**: Color-coded mask overlays
-- **Detailed Reports**: CSV summaries and statistical reports
-- **Timestamped Results**: Organized output by processing date/time
-- **Robust Logging**: Comprehensive logging for monitoring
-
-### Temperature Adjustment
-- **Batch Processing**: Processes entire directories
-- **Precise Control**: Adjustable temperature factors
-- **Format Preservation**: Maintains original image quality
-- **Non-destructive**: Creates new files, preserves originals
-
-
-### Required Libraries
-- `PIL (Pillow)` - Image processing
-- `numpy` - Numerical operations
-- `opencv-python` - Computer vision (disease analysis)
-- `scikit-image` - Morphological operations (disease analysis)
-- `pandas` - Data analysis and reporting (disease analysis)
-
+### 🖱️ GUI Version (Recommended - just double-click!)
 ```bash
-pip install pillow numpy opencv-python scikit-image pandas
+python leafstate.GUI.py
 ```
+**Or simply double-click the `leafstate.GUI.py` file!**
 
-## Usage
-
-### Leaf Disease Analysis
-
-1. Run the analysis:
+### 💻 Command Line Version
 ```bash
-python leafState.py
+# Analyze current directory
+python leafstate.CLI.py
+
+# Analyze specific directory
+python leafstate.CLI.py --input ./my_leaf_images
+
+# See all options
+python leafstate.CLI.py --help
 ```
 
-**Configuration options:**
-```python
-DIRECTORY_PATH = "path/to/your/image_directory"              # Input directory
-DISEASE_HUE = 30                        # Disease detection threshold
-CHLOROSIS_HUE_RANGE = (30, 43)         # Chlorosis detection range
-MIN_LEAF_SIZE = 500                     # Minimum leaf area (pixels)
-MIN_DISEASE_SIZE = 300                  # Minimum disease area (pixels)
-```
+## 📦 Installation
 
-### Image Temperature Adjustment
-
-1. Place images in the input directory
-2. Modify the script parameters:
-```python
-input_directory = '2025_Individuals'        # Input folder
-output_directory = '2025_Individuals/thermo' # Output folder
-temperature_factor = 0.9                     # <1 cooler, >1 warmer
-```
-
-3. Run the temperature adjustment:
+### 1. Clone from GitHub
 ```bash
-python thermostat.py
+git clone [repository-url]
+cd leaf-state
 ```
 
-**Temperature Factor Guide:**
-- `0.7` - Significantly cooler (more blue)
-- `0.9` - Slightly cooler 
-- `1.0` - No change
-- `1.1` - Slightly warmer
-- `1.3` - Significantly warmer (more red)
+### 2. Install Requirements
+```bash
+# Option 1: Use requirements file (recommended)
+pip install -r requirements.txt
 
-## Workflow Recommendations
+# Option 2: Install manually
+pip install opencv-python pillow scikit-image pandas numpy
+```
 
-### For Disease Analysis Projects
+### 3. Launch!
+- **GUI**: Double-click `leafstate.GUI.py` or run `python leafstate.GUI.py`
+- **CLI**: Run `python leafstate.CLI.py --help` for options
 
-1. **Preprocessing** (Optional):
-   ```bash
-   # Adjust temperature for consistent lighting
-   python temperature_tool.py
-   ```
+> **Note**: If emojis display as boxes or question marks, this is normal and doesn't affect functionality.
 
-2. **Disease Analysis**:
-   ```bash
-   # Analyze preprocessed or original images
-   python leaf_analysis.py
-   ```
+### Requirements
+- Python 3.7+
+- tkinter (usually included with Python)
 
-### For Optimal Results
+## 🖼️ Supported Image Formats
 
-1. Use temperature adjustment to standardize lighting conditions across image batches
-2. Process temperature-adjusted images through disease analysis
-3. Compare results with and without temperature adjustment to validate improvements
+- TIFF (.tif, .tiff)
+- PNG (.png)
+- JPEG (.jpg, .jpeg)
 
-## Output Files
+## 📁 Output
 
-### Disease Analysis Output
+The tool generates:
 
-**Directory Structure:**
+1. **Individual leaf images** with color-coded health analysis
+2. **Combined visualizations** showing all leaves in each input image
+3. **CSV results file** with detailed quantitative data
+
+### CSV Output Columns
+- `filename`: Source image name
+- `leaf_index`: Leaf number within the image
+- `leaf_area_px`: Total leaf area in pixels
+- `healthy_area_px`: Healthy tissue area
+- `necrosis_area_px`: Necrotic (brown/dead) tissue area
+- `chlorosis_area_px`: Chlorotic (yellow/stressed) tissue area
+- `percent_healthy`: Percentage of healthy tissue
+- `percent_necrosis`: Percentage of necrotic tissue
+- `percent_chlorosis`: Percentage of chlorotic tissue
+
+## ⚙️ Configuration Options
+
+### Command Line
+- `--input` / `-i`: Input directory (default: current directory)
+- `--output` / `-o`: Output directory (default: auto-generated)
+- `--verbose` / `-v`: Enable detailed logging
+- `--min-leaf-size`: Minimum leaf size in pixels (default: 500)
+- `--min-height`: Minimum leaf height in pixels (default: 80)
+
+### GUI Settings
+- **Size Filters**:
+  - Minimum Leaf Size: Filters out small objects (pixels)
+  - Minimum Leaf Height: Filters out very short objects (pixels)
+- **Color Detection** (with live color previews):
+  - Necrosis Hue: Brown/dead tissue detection threshold (0-30)
+  - Chlorosis Hue: Yellow/stressed tissue detection threshold (20-50)
+  - Healthy Hue: Green tissue upper limit (60-120)
+  - Real-time color swatches show exactly what each setting detects
+- **Options**:
+  - Verbose Logging: Shows detailed processing information
+
+## 🎨 New Features
+
+### Interactive Color Controls
+The GUI now includes **live color previews** for all HSV hue settings:
+- Adjust sliders and see the exact colors being detected
+- Fine-tune detection for your specific leaf types
+- Perfect for different lighting conditions or plant varieties
+
+### User-Friendly File Names
+- `leafstate.GUI.py` - Double-click to launch
+- `leafstate.CLI.py` - Command-line version
+- Clear, simple naming for easy GitHub distribution
+
+### Enhanced Interface
+- Larger dialog window (650x750) for better visibility
+- Organized settings sections for clarity
+- Improved button layout and text
+- Better cross-platform emoji compatibility
+
+
+## 💡 Image Preparation Tips
+
+For best results:
+- Use images with good contrast between leaves and background
+- Ensure leaves are well-lit and in focus
+- Blue backgrounds work particularly well for leaf segmentation
+- Remove or minimize shadows when possible
+
+## 🧠 Algorithm Overview
+
+1. **Color Space Conversion**: Converts images to HSV for better color analysis
+2. **Leaf Segmentation**: Creates masks to identify leaf tissue vs background
+3. **Individual Leaf Separation**: Uses connected components to separate touching leaves
+4. **Tissue Classification**: Analyzes HSV values to classify tissue health:
+   - Green hues → Healthy tissue
+   - Yellow hues → Chlorotic tissue
+   - Brown hues → Necrotic tissue
+5. **Quantification**: Calculates areas and percentages for each tissue type
+
+## 🛠️ Troubleshooting
+
+### No leaves detected
+- Check if images contain recognizable leaf shapes
+- Adjust `--min-leaf-size` and `--min-height` parameters
+- Ensure good contrast between leaves and background
+
+### Wrong tissue classification
+- The tool is calibrated for typical leaf colors
+- Very dark or unusual colored leaves may not classify correctly
+- Consider adjusting the HSV thresholds in the code if needed
+
+### Performance issues
+- Large images or many files will take longer to process
+- Consider resizing very large images before analysis
+- Use `--verbose` mode to monitor progress
+
+## 📋 Example Output Structure
+
 ```
 output/
-└── YYYYMMDD_HHMMSS/
-    ├── image1_masked.png           # Visualized results
-    ├── summary_results.csv         # Detailed measurements
-    └── analysis_summary.txt        # Statistical summary
+└── 20241201_143022/
+    ├── plot10_leaf_01_masked.png      # Individual leaf analysis
+    ├── plot10_leaf_02_masked.png
+    ├── ...
+    ├── plot10_all_leaves_masked.png   # Combined visualization
+    └── leaf_analysis_results_20241201_143024.csv
 ```
 
-**Masked Images:**
-- **Disease areas**: Brownish-red overlay (RGB: 166, 56, 22)
-- **Chlorosis areas**: Yellow overlay (RGB: 255, 222, 83)
-- **Healthy areas**: Original leaf color
-- **Background**: Transparent
+## 🆕 Recent Updates
 
-**CSV Report Fields:**
-- `filename`, `leaf_area_px`, `healthy_area_px`
-- `disease_area_px`, `chlorosis_area_px`
-- `percent_healthy`, `percent_disease`, `percent_chlorosis`
+### Version 2.0 Features
+- **Fixed 7-leaf detection limit**: Now correctly detects all leaves in images
+- **Interactive color controls**: Live HSV hue previews with color swatches
+- **Improved GUI layout**: Larger window, better organization, cleaner buttons
+- **User-friendly file names**: Simple `leafstate.GUI.py` and `leafstate.CLI.py`
+- **Enhanced error handling**: Better dependency checking and user guidance
+- **Cross-platform compatibility**: Improved emoji handling for different systems
 
-### Temperature Adjustment Output
+## 🔧 Legacy Tools
 
-Temperature-adjusted images are saved to the specified output directory with:
-- Same filename as original
-- Preserved image quality and format
-- Modified color temperature based on adjustment factor
+This repository also includes legacy tools for specialized workflows:
+
+### Image Temperature Adjustment (`thermostat.py`)
+Adjusts color temperature for consistent lighting conditions
+
+### Original Leaf Analysis (`leafState.py`)
+Earlier version of the analysis tool
+
+## 🔬 Research Applications
+
+This tool has been designed for:
+- Plant pathology research
+- Agricultural monitoring
+- Disease progression studies
+- Stress response analysis
+- High-throughput phenotyping
 
 
 ## Contributing
