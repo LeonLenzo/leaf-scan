@@ -219,7 +219,7 @@ This tool has been designed for:
 If you use these tools in your research, please cite:
 
 ```
-Coming soon
+Lenzo, L., John, E., Bradley, J., Thomas, G., Bennett, D. and Tan, K.C., 2026. Fair-weather friends. Sequential co-infection demonstrates priority effects in the outcome of Parastagonospora nodorum and Pyrenophora tritici-repentis polymicrobial foliar disease of wheat. Plant Disease.
 ```
 
 ## Contact
