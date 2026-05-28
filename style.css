@@ -1,9 +1,74 @@
+/* ── Theme variables ── */
+:root {
+    --bg:           #f4f7f6;
+    --surface:      #ffffff;
+    --surface-alt:  #e0e0e0;
+    --text:         #333333;
+    --text-muted:   #666666;
+    --border:       #eeeeee;
+    --border-input: #dddddd;
+    --btn-bg:       #ffffff;
+    --btn-hover:    #f0f0f0;
+    --btn-color:    #666666;
+    --btn-hover-color: #333333;
+    --shadow:       rgba(0,0,0,0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root[data-theme="default"] {
+        --bg:           #18191a;
+        --surface:      #242526;
+        --surface-alt:  #3a3b3c;
+        --text:         #e4e6eb;
+        --text-muted:   #b0b3b8;
+        --border:       #3e4042;
+        --border-input: #4e4f50;
+        --btn-bg:       #3a3b3c;
+        --btn-hover:    #4e4f50;
+        --btn-color:    #b0b3b8;
+        --btn-hover-color: #e4e6eb;
+        --shadow:       rgba(0,0,0,0.4);
+    }
+}
+
+:root[data-theme="dark"] {
+    --bg:           #18191a;
+    --surface:      #242526;
+    --surface-alt:  #3a3b3c;
+    --text:         #e4e6eb;
+    --text-muted:   #b0b3b8;
+    --border:       #3e4042;
+    --border-input: #4e4f50;
+    --btn-bg:       #3a3b3c;
+    --btn-hover:    #4e4f50;
+    --btn-color:    #b0b3b8;
+    --btn-hover-color: #e4e6eb;
+    --shadow:       rgba(0,0,0,0.4);
+}
+
+:root[data-theme="light"] {
+    --bg:           #f4f7f6;
+    --surface:      #ffffff;
+    --surface-alt:  #e0e0e0;
+    --text:         #333333;
+    --text-muted:   #666666;
+    --border:       #eeeeee;
+    --border-input: #dddddd;
+    --btn-bg:       #ffffff;
+    --btn-hover:    #f0f0f0;
+    --btn-color:    #666666;
+    --btn-hover-color: #333333;
+    --shadow:       rgba(0,0,0,0.05);
+}
+
+/* ── Base ── */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f7f6;
+    background-color: var(--bg);
     margin: 0;
     padding: 20px;
-    color: #333;
+    color: var(--text);
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .container {
@@ -11,11 +76,32 @@ body {
     margin: 0 auto;
 }
 
+/* ── Header ── */
 header {
     text-align: center;
     margin-bottom: 30px;
+    position: relative;
 }
 
+#themeToggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--btn-bg);
+    border: 1px solid var(--border-input);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+#themeToggle:hover {
+    background: var(--btn-hover);
+    color: var(--text);
+}
+
+/* ── Layout ── */
 .main-layout {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -23,10 +109,10 @@ header {
 }
 
 .controls {
-    background: white;
+    background: var(--surface);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px var(--shadow);
 }
 
 .control-group {
@@ -39,8 +125,10 @@ header {
     font-size: 0.9rem;
     margin-bottom: 8px;
     font-weight: 600;
+    color: var(--text);
 }
 
+/* ── Preview ── */
 .preview-area {
     display: flex;
     flex-direction: column;
@@ -54,7 +142,7 @@ header {
 }
 
 .preview-box {
-    background: #e0e0e0;
+    background: var(--surface-alt);
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -62,7 +150,7 @@ header {
 
 .preview-box h4 {
     margin-top: 0;
-    color: #666;
+    color: var(--text-muted);
 }
 
 canvas {
@@ -70,11 +158,12 @@ canvas {
     height: auto;
 }
 
+/* ── Results ── */
 #results {
-    background: white;
+    background: var(--surface);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px var(--shadow);
 }
 
 table {
@@ -86,9 +175,11 @@ table {
 th, td {
     text-align: left;
     padding: 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
 }
 
+/* ── Controls ── */
 input[type="range"] {
     width: 100%;
 }
@@ -100,8 +191,8 @@ input[type="range"] {
 }
 
 .step-btn {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--btn-bg);
+    border: 1px solid var(--border-input);
     border-radius: 4px;
     width: 24px;
     height: 24px;
@@ -111,12 +202,12 @@ input[type="range"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: var(--btn-color);
     flex-shrink: 0;
 }
 
 .step-btn:hover {
-    background: #f0f0f0;
-    border-color: #ccc;
-    color: #333;
+    background: var(--btn-hover);
+    border-color: var(--border-input);
+    color: var(--btn-hover-color);
 }

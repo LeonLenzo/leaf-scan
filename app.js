@@ -316,6 +316,26 @@ window.stepDown = (id) => {
     if (el) { el.stepDown(); el.dispatchEvent(new Event('input')); }
 };
 
+// ── Theme toggle ──
+const THEMES = ['default', 'light', 'dark'];
+const THEME_LABELS = { default: '💻 Auto', light: '☀️ Light', dark: '🌙 Dark' };
+
+(function initTheme() {
+    const saved = localStorage.getItem('theme') || 'default';
+    document.documentElement.dataset.theme = saved;
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('themeToggle').textContent = THEME_LABELS[saved];
+    });
+})();
+
+window.cycleTheme = () => {
+    const current = document.documentElement.dataset.theme || 'default';
+    const next = THEMES[(THEMES.indexOf(current) + 1) % THEMES.length];
+    document.documentElement.dataset.theme = next;
+    document.getElementById('themeToggle').textContent = THEME_LABELS[next];
+    localStorage.setItem('theme', next);
+};
+
 // OpenCV.js ready callback
 var Module = {
     onRuntimeInitialized() {
