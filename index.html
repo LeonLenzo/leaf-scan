@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeafScan</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tip-wrap { position: relative; display: inline-block; }
+        .tip-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 15px; height: 15px; border-radius: 50%;
+            background: #888; color: #fff; font-size: 10px; font-weight: bold;
+            cursor: help; margin-left: 5px; vertical-align: middle;
+            border: none; padding: 0; line-height: 1;
+        }
+        .tip-text {
+            display: none; position: absolute; left: 22px; top: -4px;
+            background: #222; color: #eee; padding: 7px 10px;
+            border-radius: 5px; font-size: 11px; width: 220px;
+            z-index: 100; line-height: 1.5; pointer-events: none;
+        }
+        .tip-wrap:hover .tip-text { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍃 LeafScan</h1>
+            <p>Interactive Plant Health Analysis</p>
+        </header>
+
+        <div class="main-layout">
+            <aside class="controls">
+                <section class="control-group">
+                    <h3>1. Image Input
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Select one or more images using the file picker. Use Prev / Next to cycle through them. Slider settings are saved per image — adjusting them on one image won't affect others. Results accumulate in the summary table as you work through the batch.</span></span>
+                    </h3>
+                    <input type="file" id="imageUpload" accept="image/*,.tif,.tiff" multiple>
+                    <div id="imageNav" style="display:none; margin-top:8px">
+                        <div id="imageInfo" style="font-size:0.8em; margin-bottom:4px; word-break:break-all"></div>
+                        <div style="display:flex; gap:6px">
+                            <button class="step-btn" style="flex:1" onclick="prevImage()">◀ Prev</button>
+                            <button class="step-btn" style="flex:1" onclick="nextImage()">Next ▶</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>2. Preprocessing</h3>
+                    <label>Temperature Correction: <span id="tempVal">1.00</span>
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Shifts the red/blue balance to correct for camera white balance. Increase if leaves or lesions are not fully registering in the analysis.</span></span>
+                    </label>
+                    <div class="slider-container">
+                        <button class="step-btn" onclick="stepDown('tempFactor')">−</button>
+                        <input type="range" id="tempFactor" min="0.5" max="1.5" step="0.05" value="1.0">
+                        <button class="step-btn" onclick="stepUp('tempFactor')">+</button>
+                    </div>
+                    <label>Contrast: <span id="contrastVal">1.0</span>
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Stretches the difference between light and dark pixels around the midpoint. Increase if spots are hard to distinguish from healthy tissue. Check the preprocessed canvas to judge the effect.</span></span>
+                    </label>
+                    <div class="slider-container">
+                        <button class="step-btn" onclick="stepDown('contrastFactor')">−</button>
+                        <input type="range" id="contrastFactor" min="1.0" max="3.0" step="0.1" value="1.0">
+                        <button class="step-btn" onclick="stepUp('contrastFactor')">+</button>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>3. Hue Thresholds (HSV)</h3>
+                    <label>Necrosis (Brown) Max: <span id="necrosisVal">21</span>
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Upper HSV hue limit for necrotic (dead/brown) tissue. Lesions typically fall between hue 10–25. Increase to capture more orange lesions; decrease if healthy tissue is being misclassified as necrotic.</span></span>
+                    </label>
+                    <div class="slider-container">
+                        <button class="step-btn" onclick="stepDown('necrosisHue')">−</button>
+                        <input type="range" id="necrosisHue" min="0" max="40" value="21">
+                        <button class="step-btn" onclick="stepUp('necrosisHue')">+</button>
+                    </div>
+
+                    <label>Chlorosis (Yellow) Max: <span id="chlorosisVal">31</span>
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Upper hue limit for chlorotic (yellowing) tissue. Pixels with hue between the Necrosis Max and this value are classed as chlorotic. Typically 30–40 for yellowing wheat tissue.</span></span>
+                    </label>
+                    <div class="slider-container">
+                        <button class="step-btn" onclick="stepDown('chlorosisHue')">−</button>
+                        <input type="range" id="chlorosisHue" min="20" max="60" value="31">
+                        <button class="step-btn" onclick="stepUp('chlorosisHue')">+</button>
+                    </div>
+
+                    <label>Healthy (Green) Max: <span id="healthyVal">75</span>
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Upper hue limit for healthy green tissue — also defines the leaf mask boundary. Keep below the hue of your background (e.g. ~75 for cyan paper) to prevent background pixels being included as leaf.</span></span>
+                    </label>
+                    <div class="slider-container">
+                        <button class="step-btn" onclick="stepDown('healthyHue')">−</button>
+                        <input type="range" id="healthyHue" min="60" max="90" value="75">
+                        <button class="step-btn" onclick="stepUp('healthyHue')">+</button>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>4. Filters</h3>
+                    <label>Min Leaf Size: <span id="sizeVal">500</span>
+                        <span class="tip-wrap"><button class="tip-btn">?</button>
+                        <span class="tip-text">Minimum pixel area for a connected region to be counted as a leaf. Increase to ignore small debris or image artefacts; decrease if small leaves or fragments are being missed entirely.</span></span>
+                    </label>
+                    <div class="slider-container">
+                        <button class="step-btn" onclick="stepDown('minLeafSize')">−</button>
+                        <input type="range" id="minLeafSize" min="100" max="5000" step="100" value="500">
+                        <button class="step-btn" onclick="stepUp('minLeafSize')">+</button>
+                    </div>
+                </section>
+
+                <div id="status">Loading OpenCV.js...</div>
+            </aside>
+
+            <main class="preview-area">
+                <div class="comparison-grid">
+                    <div class="preview-box">
+                        <h4>Preprocessed (Input)</h4>
+                        <canvas id="canvasOriginal"></canvas>
+                    </div>
+                    <div class="preview-box">
+                        <h4>Analysis Result</h4>
+                        <canvas id="canvasOutput"></canvas>
+                    </div>
+                </div>
+                <div id="results">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="margin:0">Summary Statistics</h3>
+                        <button onclick="downloadCSV()" style="padding:6px 14px;">Download CSV</button>
+                    </div>
+                    <table id="statsTable">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Leaf #</th>
+                                <th>Healthy %</th>
+                                <th>Necrosis %</th>
+                                <th>Chlorosis %</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Load OpenCV.js -->
+    <script async src="https://docs.opencv.org/4.x/opencv.js" type="text/javascript"></script>
+    <!-- Load UTIF.js for TIFF support -->
+    <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

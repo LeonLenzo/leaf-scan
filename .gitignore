@@ -3,6 +3,12 @@ intergrain/
 data/
 images/
 output/
+coinday10/
+images bad temp/
+2025_Field/
+
+# Windows Zone.Identifier files
+*Zone.Identifier
 results/
 
 # Image files

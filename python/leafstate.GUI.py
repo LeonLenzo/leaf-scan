@@ -16,6 +16,7 @@ Requirements:
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import threading
+import shutil
 import sys
 import os
 from pathlib import Path
@@ -177,9 +178,39 @@ class LeafAnalysisGUI:
             command=self.browse_output
         ).grid(row=2, column=2, padx=(5, 0), pady=5)
 
+        # Preprocessing frame
+        preprocess_frame = ttk.LabelFrame(main_frame, text="Preprocessing", padding="10")
+        preprocess_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+        preprocess_frame.columnconfigure(2, weight=1)
+
+        self.temp_correct_var = tk.BooleanVar()
+        ttk.Checkbutton(
+            preprocess_frame,
+            text="Apply Temperature Correction",
+            variable=self.temp_correct_var,
+            command=self.toggle_temp_factor
+        ).grid(row=0, column=0, columnspan=3, sticky=tk.W)
+
+        ttk.Label(preprocess_frame, text="Temperature Factor:").grid(row=1, column=0, sticky=tk.W, pady=(8, 0))
+        self.temp_factor_var = tk.DoubleVar(value=1.0)
+        self.temp_factor_spinbox = ttk.Spinbox(
+            preprocess_frame,
+            from_=0.5,
+            to=2.0,
+            increment=0.05,
+            textvariable=self.temp_factor_var,
+            width=8,
+            format="%.2f",
+            state='disabled'
+        )
+        self.temp_factor_spinbox.grid(row=1, column=1, sticky=tk.W, padx=(10, 5), pady=(8, 0))
+        ttk.Label(preprocess_frame, text=">1.0 = warmer,  <1.0 = cooler").grid(
+            row=1, column=2, sticky=tk.W, padx=(5, 0), pady=(8, 0)
+        )
+
         # Settings frame
         settings_frame = ttk.LabelFrame(main_frame, text="Analysis Settings", padding="10")
-        settings_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=20)
+        settings_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=20)
         settings_frame.columnconfigure(1, weight=1)
 
         # Size settings
@@ -237,7 +268,7 @@ class LeafAnalysisGUI:
 
         # Progress frame
         progress_frame = ttk.LabelFrame(main_frame, text="Progress", padding="10")
-        progress_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=20)
+        progress_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=20)
         progress_frame.columnconfigure(0, weight=1)
 
         # Progress bar
@@ -256,7 +287,7 @@ class LeafAnalysisGUI:
 
         # Buttons frame
         buttons_frame = ttk.Frame(main_frame)
-        buttons_frame.grid(row=5, column=0, columnspan=3, pady=20)
+        buttons_frame.grid(row=6, column=0, columnspan=3, pady=20)
 
         # Start analysis button
         self.start_button = ttk.Button(
@@ -281,6 +312,26 @@ class LeafAnalysisGUI:
             text="Help",
             command=self.show_help
         ).grid(row=0, column=2, padx=(10, 0))
+
+    def toggle_temp_factor(self):
+        """Enable or disable the temperature factor spinbox based on checkbox state"""
+        state = 'normal' if self.temp_correct_var.get() else 'disabled'
+        self.temp_factor_spinbox.config(state=state)
+
+    def apply_temperature_correction(self, input_dir, temp_dir):
+        """Copy images to temp_dir with temperature adjustment applied"""
+        from thermostat import adjust_temperature
+
+        os.makedirs(temp_dir, exist_ok=True)
+        factor = self.temp_factor_var.get()
+        valid_extensions = ('.tif', '.tiff', '.png', '.jpg', '.jpeg')
+
+        for filename in os.listdir(input_dir):
+            if filename.lower().endswith(valid_extensions):
+                src = os.path.join(input_dir, filename)
+                dst = os.path.join(temp_dir, filename)
+                with Image.open(src) as img:
+                    adjust_temperature(img, factor).save(dst)
 
     def browse_input(self):
         """Browse for input directory"""
@@ -351,20 +402,31 @@ class LeafAnalysisGUI:
 
     def run_analysis(self, input_dir, output_dir):
         """Run analysis in background thread"""
+        temp_dir = None
         try:
+            analysis_input = input_dir
+
+            if self.temp_correct_var.get():
+                temp_dir = os.path.join(input_dir, "_temp_corrected")
+                self.root.after(0, lambda: self.status_var.set("Applying temperature correction..."))
+                self.apply_temperature_correction(input_dir, temp_dir)
+                analysis_input = temp_dir
+
             result_path = analyze_directory(
-                input_dir,
+                analysis_input,
                 output_dir,
                 self.config,
                 self.verbose_var.get()
             )
 
-            # Update GUI on main thread
             self.root.after(0, self.analysis_complete, result_path)
 
         except Exception as e:
-            # Update GUI on main thread
             self.root.after(0, self.analysis_error, str(e))
+
+        finally:
+            if temp_dir and os.path.exists(temp_dir):
+                shutil.rmtree(temp_dir)
 
     def analysis_complete(self, result_path):
         """Handle successful analysis completion"""

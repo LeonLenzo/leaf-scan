@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 
 # HARD-CODED CONFIGURATION
-DIRECTORY_PATH = "./intergrain"  # Replace with your actual path
+DIRECTORY_PATH = "./coinday10/thermo"  # Replace with your actual path
 OUTPUT_DIRECTORY = os.path.join(DIRECTORY_PATH, "output")
 DISEASE_HUE = 30  # Adjusted hue value for disease
 CHLOROSIS_HUE_RANGE = (30, 43)  # Hue range for chlorosis (yellowing)
